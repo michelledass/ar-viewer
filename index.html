@@ -8,54 +8,43 @@
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
   </style>
+  <!-- Include A-Frame library -->
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <!-- Include AR.js library -->
+  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
 </head>
 <body>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/webxr/ARButton.js"></script>
+  <!-- Add AR.js scene with AR capabilities -->
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false; trackingMethod: best;">
+    <!-- Define marker (Hiro marker in this case) -->
+    <a-marker preset="hiro">
+      <!-- A simple green box to show in AR -->
+      <a-box position='0 0.5 0' material="color: green;"></a-box>
+    </a-marker>
+    <!-- Add camera for AR experience (but camera will only be activated manually) -->
+    <a-entity camera></a-entity>
+  </a-scene>
+  
+  <!-- AR button component (this is crucial) -->
   <script>
-    let scene, camera, renderer, cube;
-    
-    function init() {
-      scene = new THREE.Scene();
-      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      document.body.appendChild(renderer.domElement);
-      
-      // Create a cube
-      const geometry = new THREE.BoxGeometry();
-      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-      cube = new THREE.Mesh(geometry, material);
-      scene.add(cube);
-      camera.position.z = 5;
+    // Adding AR button
+    var arButton = document.createElement('button');
+    arButton.innerHTML = "Enter AR";
+    arButton.style.position = 'absolute';
+    arButton.style.top = '20px';
+    arButton.style.left = '20px';
+    arButton.style.padding = '10px';
+    arButton.style.background = 'rgba(0, 0, 0, 0.5)';
+    arButton.style.color = 'white';
+    document.body.appendChild(arButton);
 
-      // Add OrbitControls (for testing without AR)
-      const controls = new THREE.OrbitControls(camera, renderer.domElement);
-
-      // Set up the AR button
-      const button = new THREE.ARButton.createButton(renderer, {
-        requiredFeatures: ['hit-test'],
-        onSessionStarted: () => {
-          document.body.style.backgroundColor = 'black';
-        },
-        onSessionEnded: () => {
-          document.body.style.backgroundColor = '';
-        }
-      });
-      document.body.appendChild(button);
-      
-      animate();
-    }
-    
-    function animate() {
-      requestAnimationFrame(animate);
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
-      renderer.render(scene, camera);
-    }
-
-    init();
+    // Activate AR when button is clicked
+    arButton.onclick = function() {
+      var scene = document.querySelector('a-scene');
+      if (scene) {
+        scene.enterVR(); // This triggers entering AR mode in A-Frame
+      }
+    };
   </script>
 </body>
 </html>
